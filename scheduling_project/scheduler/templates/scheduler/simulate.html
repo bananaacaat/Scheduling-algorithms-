@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .task-entry {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .remove-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .remove-btn:hover {
+            background-color: #cc0000;
+        }
+        pre {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Task Scheduling Simulation</h1>
+    </header>
+
+    <div class="container">
+        <!-- Formulaire de simulation -->
+        <form method="POST" action="{% url 'simulate' %}">
+            {% csrf_token %}
+            <label for="algorithm">Choose an Algorithm:</label>
+            <select name="algorithm" id="algorithm" required>
+                <option value="FCFS">FCFS</option>
+                <option value="SJF">SJF</option>
+                <option value="RM">RM</option>
+                <option value="DM">DM</option>
+                <option value="LLF">LLF</option>
+                <option value="EDF">EDF</option>
+            </select>
+
+            <h3>Tasks</h3>
+            <div id="task-list">
+                <div class="task-entry">
+                    <input type="number" name="task_id" placeholder="ID" required>
+                    <input type="number" name="arrival_time" placeholder="Arrival Time" required>
+                    <input type="number" name="execution_time" placeholder="Execution Time" required>
+                    <input type="number" name="deadline" placeholder="Deadline" required>
+                    <input type="number" name="period" placeholder="Period" required>
+                    <button type="button" class="remove-btn" onclick="removeTask(this)">Remove</button>
+                </div>
+            </div>
+
+            <button type="button" onclick="addTask()">Add Task</button>
+            <button type="submit">Run Simulation</button>
+        </form>
+
+        <!-- Résultats -->
+        {% if result %}
+            <h2>Simulation Results</h2>
+            <pre>{{ result }}</pre>
+        {% endif %}
+
+        {% if steps %}
+            <h2>Steps</h2>
+            <pre>{{ steps }}</pre>
+        {% endif %}
+
+        {% if gantt_chart %}
+            <h2>Gantt Chart</h2>
+            <img src="{{ gantt_chart }}" alt="Gantt Chart">
+        {% endif %}
+    </div>
+
+    <script>
+        // Fonction pour ajouter une nouvelle tâche
+        function addTask() {
+            const taskList = document.getElementById('task-list');
+            const newTask = document.createElement('div');
+            newTask.className = 'task-entry';
+            newTask.innerHTML = `
+                <input type="number" name="task_id" placeholder="ID" required>
+                <input type="number" name="arrival_time" placeholder="Arrival Time" required>
+                <input type="number" name="execution_time" placeholder="Execution Time" required>
+                <input type="number" name="deadline" placeholder="Deadline" required>
+                <input type="number" name="period" placeholder="Period" required>
+                <button type="button" class="remove-btn" onclick="removeTask(this)">Remove</button>
+            `;
+            taskList.appendChild(newTask);
+        }
+
+        // Fonction pour supprimer une tâche
+        function removeTask(button) {
+            const taskEntry = button.parentElement; // Récupérer l'élément parent contenant la tâche
+            taskEntry.remove();
+        }
+    </script>
+</body>
+</html>
